@@ -1,0 +1,19 @@
+version: '3'
+services:
+  mongodb:
+    image: mongo:4.2.23-bionic
+    container_name: mongodb
+    ports: ["27017:27017"]
+    volumes:
+      - ./scripts/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+  forgeresponseapi:
+    image: cosmtrek/air
+    container_name: air
+    working_dir: /app
+    ports: ["9000:9000"]
+    environment:
+      - issuerUrl=${issuerUrl}
+      - audience=${audience}
+    volumes:
+      - ./:/app
+      - ~/.config:/root/.config

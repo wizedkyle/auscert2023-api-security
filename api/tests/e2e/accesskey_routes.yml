@@ -1,0 +1,227 @@
+name: Access Key Routes Test
+
+vars:
+  url: http://localhost:9000
+  validtenant: forge_SQFo1b3.QjMLd36neDn5HQpRTREe97x2zc59dP9dSreUONGmlYvt
+
+testcases:
+  - name: List access keys
+    steps:
+      - type: http
+        method: GET
+        url: {{.url}}/v1/accesskeys
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson.__type__ ShouldEqual Array
+          - result.bodyjson.bodyjson0 ShouldContainKey id
+          - result.bodyjson.bodyjson0 ShouldContainKey description
+          - result.bodyjson.bodyjson0 ShouldContainKey expiration
+          - result.bodyjson.bodyjson0 ShouldContainKey keyPrefix
+          - result.bodyjson.bodyjson0 ShouldContainKey scopes
+
+  - name: List access keys with limit
+    steps:
+      - type: http
+        method: GET
+        url: {{.url}}/v1/accesskeys?limit=1
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson.__type__ ShouldEqual Array
+          - result.bodyjson.__len__ ShouldEqual 1
+          - result.bodyjson.bodyjson0 ShouldContainKey id
+          - result.bodyjson.bodyjson0 ShouldContainKey description
+          - result.bodyjson.bodyjson0 ShouldContainKey expiration
+          - result.bodyjson.bodyjson0 ShouldContainKey keyPrefix
+          - result.bodyjson.bodyjson0 ShouldContainKey scopes
+
+  - name: Get access key
+    steps:
+      - type: http
+        method: GET
+        url: {{.url}}/v1/accesskeys/99fae8de-37f9-45de-95e8-446d09bad2fe
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey description
+          - result.bodyjson ShouldContainKey expiration
+          - result.bodyjson ShouldContainKey keyPrefix
+          - result.bodyjson ShouldContainKey scopes
+
+  - name: Get access key from another tenant
+    steps:
+      - type: http
+        method: GET
+        url: {{.url}}/v1/accesskeys/e52fb82a-fed6-40c1-ab00-11c1880d2a39
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 404
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Create access key
+    steps:
+      - type: http
+        method: POST
+        url: {{.url}}/v1/accesskeys
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"description": "E2E Test Key", "duration": 30, "scopes": ["read:users"]}'
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey description
+          - result.bodyjson ShouldContainKey expiration
+          - result.bodyjson ShouldContainKey key
+          - result.bodyjson ShouldContainKey scopes
+
+  - name: Create access key with invalid scope
+    steps:
+      - type: http
+        method: POST
+        url: {{.url}}/v1/accesskeys
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"description": "E2E Test Key", "duration": 30, "scopes": ["readtest:userstest"]}'
+        assertions:
+          - result.statuscode ShouldEqual 400
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Create access key with invalid body
+    steps:
+      - type: http
+        method: POST
+        url: {{.url}}/v1/accesskeys
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"descriptionTest": "E2E Test Key", "durationTest": 30, "scopesTest": ["read:users"]}'
+        assertions:
+          - result.statuscode ShouldEqual 400
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Update access key
+    steps:
+      - type: http
+        method: PUT
+        url: {{.url}}/v1/accesskeys/8d743f30-6a17-476e-8405-14678801e60c
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"description": "E2E Test Key Update", "scopes": ["read:users"]}'
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey description
+          - result.bodyjson ShouldContainKey expiration
+          - result.bodyjson ShouldContainKey scopes
+
+  - name: Update access key from another tenant
+    steps:
+      - type: http
+        method: PUT
+        url: {{.url}}/v1/accesskeys/e52fb82a-fed6-40c1-ab00-11c1880d2a39
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"description": "E2E Test Key Update", "scopes": ["read:users"]}'
+        assertions:
+          - result.statuscode ShouldEqual 404
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Update access key with invalid scope
+    steps:
+      - type: http
+        method: PUT
+        url: {{.url}}/v1/accesskeys/99fae8de-37f9-45de-95e8-446d09bad2fe
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"description": "E2E Test Key Update", "scopes": ["readtest:userstest"]}'
+        assertions:
+          - result.statuscode ShouldEqual 400
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Update access key with invalid body
+    steps:
+      - type: http
+        method: PUT
+        url: {{.url}}/v1/accesskeys/8d743f30-6a17-476e-8405-14678801e60c
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"descriptionTest": "E2E Test Key Update", "scopesTest": ["read:users"]}'
+        assertions:
+          - result.statuscode ShouldEqual 400
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Rotate access key
+    steps:
+      - type: http
+        method: POST
+        url: {{.url}}/v1/accesskeys/8d743f30-6a17-476e-8405-14678801e60c/rotate
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"duration": 30}'
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey expiration
+          - result.bodyjson ShouldContainKey key
+
+  - name: Rotate access key from another tenant
+    steps:
+      - type: http
+        method: POST
+        url: {{.url}}/v1/accesskeys/e52fb82a-fed6-40c1-ab00-11c1880d2a39/rotate
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"duration": 30}'
+        assertions:
+          - result.statuscode ShouldEqual 404
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Delete access key
+    steps:
+      - type: http
+        method: DELETE
+        url: {{.url}}/v1/accesskeys/8d743f30-6a17-476e-8405-14678801e60c
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 204
+
+  - name: Delete access key from another tenant
+    steps:
+      - type: http
+        method: DELETE
+        url: {{.url}}/v1/accesskeys/e52fb82a-fed6-40c1-ab00-11c1880d2a39
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 404
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId

@@ -1,0 +1,214 @@
+name: User Routes Test
+
+vars:
+  url: http://localhost:9000
+  validtenant: forge_SQFo1b3.QjMLd36neDn5HQpRTREe97x2zc59dP9dSreUONGmlYvt
+  invalidtenant: forge_pNh4No9.e0jSldY8JxyWpYYoXIvYmEsyg1c9P8jmTU3pRBDA8yT4
+
+testcases:
+  - name: List users
+    steps:
+      - type: http
+        method: GET
+        url: {{.url}}/v1/users
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson.__type__ ShouldEqual Array
+          - result.bodyjson.bodyjson0 ShouldContainKey id
+          - result.bodyjson.bodyjson0 ShouldContainKey email
+          - result.bodyjson.bodyjson0 ShouldContainKey firstName
+          - result.bodyjson.bodyjson0 ShouldContainKey lastName
+          - result.bodyjson.bodyjson0 ShouldContainKey lastSignIn
+          - result.bodyjson.bodyjson0 ShouldContainKey createdTime
+          - result.bodyjson.bodyjson0 ShouldContainKey roles
+          - result.bodyjson.bodyjson0 ShouldContainKey isActive
+
+  - name: List users with limit
+    steps:
+      - type: http
+        method: GET
+        url: {{.url}}/v1/users?limit=1
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson.__type__ ShouldEqual Array
+          - result.bodyjson.__len__ ShouldEqual 1
+          - result.bodyjson.bodyjson0 ShouldContainKey id
+          - result.bodyjson.bodyjson0 ShouldContainKey email
+          - result.bodyjson.bodyjson0 ShouldContainKey firstName
+          - result.bodyjson.bodyjson0 ShouldContainKey lastName
+          - result.bodyjson.bodyjson0 ShouldContainKey lastSignIn
+          - result.bodyjson.bodyjson0 ShouldContainKey createdTime
+          - result.bodyjson.bodyjson0 ShouldContainKey roles
+          - result.bodyjson.bodyjson0 ShouldContainKey isActive
+
+  - name: List users from another tenant
+    steps:
+      - type: http
+        method: GET
+        url: {{.url}}/v1/users
+        headers:
+          Authorization: {{.invalidtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 404
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Get user
+    steps:
+      - type: http
+        method: GET
+        url: {{.url}}/v1/users/3298224e-e54b-4515-b724-71921d963e6d
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey email
+          - result.bodyjson ShouldContainKey firstName
+          - result.bodyjson ShouldContainKey lastName
+          - result.bodyjson ShouldContainKey lastSignIn
+          - result.bodyjson ShouldContainKey createdTime
+          - result.bodyjson ShouldContainKey roles
+          - result.bodyjson ShouldContainKey isActive
+
+  - name: Get user from another tenant
+    steps:
+      - type: http
+        method: GET
+        url: {{.url}}/v1/users/a263321b-f7f7-4cfb-af86-f8628b6562df
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 404
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Create user
+    steps:
+      - type: http
+        method: POST
+        url: {{.url}}/v1/users
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"email": "e2etest@test.com", "firstName": "endtoend", "lastName": "test"}'
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey email
+          - result.bodyjson ShouldContainKey firstName
+          - result.bodyjson ShouldContainKey lastName
+          - result.bodyjson ShouldContainKey lastSignIn
+          - result.bodyjson ShouldContainKey createdTime
+          - result.bodyjson ShouldContainKey roles
+          - result.bodyjson ShouldContainKey isActive
+
+  - name: Create user with duplicate email
+    steps:
+      - type: http
+        method: POST
+        url: {{.url}}/v1/users
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"email": "test@test.com", "firstName": "endtoend", "lastName": "test"}'
+        assertions:
+          - result.statuscode ShouldEqual 422
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Create user with invalid body
+    steps:
+      - type: http
+        method: POST
+        url: {{.url}}/v1/users
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"emailTest": "test2222@test.com", "firstNameTest": "endtoend", "lastNameTest": "test"}'
+        assertions:
+          - result.statuscode ShouldEqual 400
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Update user
+    steps:
+      - type: http
+        method: PUT
+        url: {{.url}}/v1/users/3298224e-e54b-4515-b724-71921d963e6d
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"firstName": "testendtoend", "lastName": "test", "isActive": true}'
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey email
+          - result.bodyjson ShouldContainKey firstName
+          - result.bodyjson ShouldContainKey lastName
+          - result.bodyjson ShouldContainKey lastSignIn
+          - result.bodyjson ShouldContainKey createdTime
+          - result.bodyjson ShouldContainKey roles
+          - result.bodyjson ShouldContainKey isActive
+
+  - name: Update user from another tenant
+    steps:
+      - type: http
+        method: PUT
+        url: {{.url}}/v1/users/a263321b-f7f7-4cfb-af86-f8628b6562df
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"firstName": "testendtoend", "lastName": "test", "isActive": true}'
+        assertions:
+          - result.statuscode ShouldEqual 404
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Update user with invalid body
+    steps:
+      - type: http
+        method: PUT
+        url: {{.url}}/v1/users/3298224e-e54b-4515-b724-71921d963e6d
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"firstNameTest": "testendtoend", "lastNameTest": "test", "isActiveTest": true}'
+        assertions:
+          - result.statuscode ShouldEqual 400
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Delete user
+    steps:
+      - type: http
+        method: DELETE
+        url: {{.url}}/v1/users/3298224e-e54b-4515-b724-71921d963e6d
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 204
+
+  - name: Delete user from another tenant
+    steps:
+      - type: http
+        method: DELETE
+        url: {{.url}}/v1/users/a263321b-f7f7-4cfb-af86-f8628b6562df
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 404
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId

@@ -1,0 +1,1435 @@
+openapi: '3.0.3'
+
+info:
+  title: AusCERT 2023 - Going back to the basics of API security
+  description: API documentation for a demo API.
+  contact:
+    name: Kyle Jackson
+    email: kyle.jackson@forgeresponse.com
+  version: 1.0.0
+
+servers:
+  - url: https://auscert.forgeresponse.com
+
+components:
+  schemas:
+    Event:
+      type: object
+      properties:
+        scopes:
+          type: array
+          items:
+            type: string
+    Incident:
+      type: object
+      properties:
+        id:
+          type: string
+        assignedTo:
+          type: string
+        attachments:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+        createdBy:
+          type: string
+        description:
+          type: string
+        severity:
+          type: string
+        status:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        tasks:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+        title:
+          type: string
+        tlp:
+          type: integer
+    CreateIncidentRequest:
+      type: object
+      properties:
+        assignedTo:
+          type: string
+        description:
+          type: string
+        severity:
+          type: string
+        status:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        title:
+          type: string
+        tlp:
+          type: integer
+    UpdateIncidentRequest:
+      type: object
+      properties:
+        assignedTo:
+          type: string
+        description:
+          type: string
+        severity:
+          type: string
+        status:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        title:
+          type: string
+        tlp:
+          type: integer
+    IncidentComment:
+      type: object
+      properties:
+        id:
+          type: string
+        comment:
+          type: string
+        createdAt:
+          type: string
+        createdBy:
+          type: string
+        order:
+          type: integer
+    CreateIncidentCommentRequest:
+      type: object
+      properties:
+        comment:
+          type: string
+    UpdateIncidentCommentRequest:
+      type: object
+      properties:
+        comment:
+          type: string
+    Investigation:
+      type: object
+      properties:
+        id:
+          type: string
+        assignedTo:
+          type: string
+        attachments:
+          type: object
+          properties:
+            id:
+              type: string
+        createdBy:
+          type: string
+        createdAt:
+          type: string
+        comments:
+          type: object
+          properties:
+            id:
+              type: string
+        description:
+          type: string
+        investigationId:
+          type: string
+        severity:
+          type: string
+        status:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        title:
+          type: string
+        tlp:
+          type: integer
+    CreateInvestigationRequest:
+      type: object
+      properties:
+        assignedTo:
+          type: string
+        description:
+          type: string
+        severity:
+          type: string
+        status:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        templateId:
+          type: string
+        title:
+          type: string
+        tlp:
+          type: integer
+    UpdateInvestigationRequest:
+      type: object
+      properties:
+        assignedTo:
+          type: string
+        description:
+          type: string
+        severity:
+          type: string
+        status:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        title:
+          type: string
+        tlp:
+          type: integer
+    InvestigationTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+        createdBy:
+          type: string
+        createdAt:
+          type: string
+        description:
+          type: string
+        titlePrefix:
+          type: string
+        severity:
+          type: string
+        status:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        tlp:
+          type: integer
+    CreateInvestigationTemplateRequest:
+      type: object
+      properties:
+        description:
+          type: string
+        titlePrefix:
+          type: string
+        severity:
+          type: string
+        status:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        tlp:
+          type: integer
+    UpdateInvestigationTemplateRequest:
+      type: object
+      properties:
+        description:
+          type: string
+        titlePrefix:
+          type: string
+        severity:
+          type: string
+        status:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        tlp:
+          type: integer
+    Scope:
+      type: object
+      properties:
+        scopes:
+          type: array
+          items:
+            type: string
+    Tenant:
+      type: object
+      properties:
+        tenantId:
+          type: string
+        name:
+          type: string
+    CreateTenantRequest:
+      type: object
+      properties:
+        name:
+          type: string
+    UpdateTenantRequest:
+      type: object
+      properties:
+        name:
+          type: string
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        lastSignIn:
+          type: string
+        createdTime:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+        isActive:
+          type: boolean
+    CreateUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+    UpdateUserRequest:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        isActive:
+          type: boolean
+    Webhook:
+      type: object
+      properties:
+        id:
+          type: string
+        algorithm:
+          type: string
+        description:
+          type: string
+        events:
+          type: array
+          items:
+            type: string
+        secret:
+          type: string
+        url:
+          type: string
+    CreateWebhookRequest:
+      type: object
+      properties:
+        description:
+          type: string
+        events:
+          type: array
+          items:
+            type: string
+        url:
+          type: string
+    UpdateWebhookRequest:
+      type: object
+      properties:
+        description:
+          type: string
+        events:
+          type: array
+          items:
+            type: string
+        url:
+          type: string
+    ErrorResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        message:
+          type: string
+        code:
+          type: integer
+        transactionId:
+          type: string
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      name: Authorization
+      in: header
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /v1/events:
+    get:
+      description: Returns available event types
+      tags:
+        - Events
+      responses:
+        '200':
+          description: Successfully returned events
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/incidents:
+    get:
+      description: Returns a list of incidents
+      tags:
+        - Incidents
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          description: Specify the number of items to return
+      responses:
+        '200':
+          description: Successfully returned a list of incidents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Incident'
+        '404':
+          description: No records found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      description: Creates a new incident
+      tags:
+        - Incidents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateIncidentRequest'
+      responses:
+        '200':
+          description: Successfully created incident
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+        '400':
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+
+  /v1/incidents/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: Id of the incident
+        required: true
+        schema:
+          type: string
+    get:
+      description: Returns the specified incident
+      tags:
+        - Incidents
+      responses:
+        '200':
+          description: Successfully returned incident
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+        '404':
+          description: No record found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      description: Updates the specified incident
+      tags:
+        - Incidents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateIncidentRequest'
+      responses:
+        '200':
+          description: Successfully updated incident
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Incident'
+        '400':
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      description: Deletes the specified incident
+      tags:
+        - Incidents
+      responses:
+        '204':
+          description: Successfully deleted incident
+        '404':
+          description: No record found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/incidents/{id}/comments:
+    parameters:
+      - name: id
+        in: path
+        description: Id of the incident
+        required: true
+        schema:
+          type: string
+    get:
+      description: Returns a list of incident comments
+      tags:
+        - Incidents
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          description: Specify the number of items to return
+      responses:
+        '200':
+          description: Successfully returned a list of incident comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IncidentComment'
+        '404':
+          description: No records found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      description: Creates a new incident comment
+      tags:
+        - Incidents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateIncidentCommentRequest'
+      responses:
+        '200':
+          description: Successfully created incident comment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidentComment'
+        '400':
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+
+  /v1/incidents/{id}/comments/{commentId}:
+    parameters:
+      - name: id
+        in: path
+        description: Id of the incident
+        required: true
+        schema:
+          type: string
+      - name: commentId
+        in: path
+        description: Id of the comment
+        required: true
+        schema:
+          type: string
+    get:
+      description: Returns the specified incident comment
+      tags:
+        - Incidents
+      responses:
+        '200':
+          description: Successfully returned incident comment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidentComment'
+        '404':
+          description: No record found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      description: Updates the specified incident comment
+      tags:
+        - Incidents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateIncidentCommentRequest'
+      responses:
+        '200':
+          description: Successfully updated incident comment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidentComment'
+        '400':
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      description: Deletes the specified incident comment
+      tags:
+        - Incidents
+      responses:
+        '204':
+          description: Successfully deleted incident comment
+        '404':
+          description: No record found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/investigations:
+    get:
+      description: Returns a list of investigations
+      tags:
+        - Investigations
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          description: Specify the number of items to return
+      responses:
+        '200':
+          description: Successfully returned a list of investigations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Investigation'
+        '404':
+          description: No records found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      description: Creates a new investigation
+      tags:
+        - Investigations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInvestigationRequest'
+      responses:
+        '200':
+          description: Successfully created investigation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Investigation'
+        '400':
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/investigations/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: Id of the investigation
+        required: true
+        schema:
+          type: string
+    get:
+      description: Returns the specified investigation
+      tags:
+        - Investigations
+      responses:
+        '200':
+          description: Successfully returned investigation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Investigation'
+        '404':
+          description: No record found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      description: Updates the specified investigation
+      tags:
+        - Investigations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInvestigationRequest'
+      responses:
+        '200':
+          description: Successfully updated access key
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Investigation'
+        '400':
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      description: Deletes the specified investigation
+      tags:
+        - Investigations
+      responses:
+        '204':
+          description: Successfully deleted investigation
+        '404':
+          description: No record found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/investigations/template:
+    get:
+      description: Returns a list of investigation templates
+      tags:
+        - Investigation Templates
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          description: Specify the number of items to return
+      responses:
+        '200':
+          description: Successfully returned a list of investigation templates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InvestigationTemplate'
+        '404':
+          description: No records found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      description: Creates a new investigation template
+      tags:
+        - Investigation Templates
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInvestigationTemplateRequest'
+      responses:
+        '200':
+          description: Successfully created investigation template
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestigationTemplate'
+        '400':
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+
+  /v1/investigations/template/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: Id of the investigation template
+        required: true
+        schema:
+          type: string
+    get:
+      description: Returns the specified investigation template
+      tags:
+        - Investigation Templates
+      responses:
+        '200':
+          description: Successfully returned investigation template
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestigationTemplate'
+        '404':
+          description: No record found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      description: Updates the specified investigation template
+      tags:
+        - Investigation Templates
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInvestigationTemplateRequest'
+      responses:
+        '200':
+          description: Successfully updated access key
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestigationTemplate'
+        '400':
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      description: Deletes the specified investigation template
+      tags:
+        - Investigation Templates
+      responses:
+        '204':
+          description: Successfully deleted investigation template
+        '404':
+          description: No record found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/scopes:
+    get:
+      description: Returns available RBAC scopes
+      tags:
+        - Scopes
+      responses:
+        '200':
+          description: Successfully returned scopes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Scope'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/tenants:
+    post:
+      description: Creates a new tenant
+      tags:
+        - Tenants
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTenantRequest'
+      responses:
+        '200':
+          description: Successfully created tenant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tenant'
+        '400':
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+
+  /v1/tenants/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: Id of the tenant
+        required: true
+        schema:
+          type: string
+    get:
+      description: Returns the specified tenant
+      tags:
+        - Tenants
+      responses:
+        '200':
+          description: Successfully returned tenant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tenant'
+        '404':
+          description: No record found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      description: Updates the specified tenant
+      tags:
+        - Tenants
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTenantRequest'
+      responses:
+        '200':
+          description: Successfully updated access key
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tenant'
+        '400':
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      description: Deletes the specified tenant
+      tags:
+        - Tenants
+      responses:
+        '204':
+          description: Successfully deleted tenant
+        '404':
+          description: No record found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/users:
+    get:
+      description: Returns a list of users
+      tags:
+        - Users
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          description: Specify the number of items to return
+      responses:
+        '200':
+          description: Successfully returned a list of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '404':
+          description: No records found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      description: Creates a new user
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '200':
+          description: Successfully created user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/users/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: Id of the user
+        required: true
+        schema:
+          type: string
+    get:
+      description: Returns the specified user
+      tags:
+        - Users
+      responses:
+        '200':
+          description: Successfully returned user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: No record found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      description: Updates specified user
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: Successfully updated user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      description: Deletes the specified user
+      tags:
+        - Users
+      responses:
+        '204':
+          description: Successfully deleted user
+        '404':
+          description: No record found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/webhooks:
+    get:
+      description: Returns a list of webhooks
+      tags:
+        - Webhooks
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          description: Specify the number of items to return
+      responses:
+        '200':
+          description: Successfully returned a list of webhooks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Webhook'
+        '404':
+          description: No records found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      description: Creates a new webhook
+      tags:
+        - Webhooks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWebhookRequest'
+      responses:
+        '200':
+          description: Successfully created webhook
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Webhook'
+        '400':
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/webhooks/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: Id of the user
+        required: true
+        schema:
+          type: string
+    get:
+      description: Returns the specified webhook
+      tags:
+        - Webhooks
+      responses:
+        '200':
+          description: Successfully returned webhook
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Webhook'
+        '404':
+          description: No record found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      description: Updates the specified webhook
+      tags:
+        - Webhooks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWebhookRequest'
+      responses:
+        '200':
+          description: Successfully updated webhook
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Webhook'
+        '400':
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      description: Deletes the specified webhook
+      tags:
+        - Webhooks
+      responses:
+        '204':
+          description: Successfully deleted webhook
+        '404':
+          description: No record found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/webhooks/{id}/rotate:
+    parameters:
+      - name: id
+        in: path
+        description: Id of the user
+        required: true
+        schema:
+          type: string
+    post:
+      description: Rotates the secret for the specified webhook
+      tags:
+        - Webhooks
+      responses:
+        '200':
+          description: Successfully rotated webhook secret
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Webhook'
+        '400':
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'

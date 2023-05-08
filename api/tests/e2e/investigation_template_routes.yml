@@ -1,0 +1,160 @@
+name: Investigation Template Routes Test
+
+vars:
+  url: http://localhost:9000
+  validtenant: forge_SQFo1b3.QjMLd36neDn5HQpRTREe97x2zc59dP9dSreUONGmlYvt
+
+testcases:
+  - name: List investigation templates
+    steps:
+      - type: http
+        method: GET
+        url: {{.url}}/v1/investigations/template
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson.__type__ ShouldEqual Array
+          - result.bodyjson.bodyjson0 ShouldContainKey id
+          - result.bodyjson.bodyjson0 ShouldContainKey createdBy
+          - result.bodyjson.bodyjson0 ShouldContainKey createdAt
+          - result.bodyjson.bodyjson0 ShouldContainKey description
+          - result.bodyjson.bodyjson0 ShouldContainKey titlePrefix
+          - result.bodyjson.bodyjson0 ShouldContainKey severity
+          - result.bodyjson.bodyjson0 ShouldContainKey status
+          - result.bodyjson.bodyjson0 ShouldContainKey tags
+          - result.bodyjson.bodyjson0 ShouldContainKey tlp
+
+  - name: List investigation templates with limit
+    steps:
+      - type: http
+        method: GET
+        url: {{.url}}/v1/investigations/template?limit=1
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson.__type__ ShouldEqual Array
+          - result.bodyjson.__len__ ShouldEqual 1
+          - result.bodyjson.bodyjson0 ShouldContainKey id
+          - result.bodyjson.bodyjson0 ShouldContainKey createdBy
+          - result.bodyjson.bodyjson0 ShouldContainKey createdAt
+          - result.bodyjson.bodyjson0 ShouldContainKey description
+          - result.bodyjson.bodyjson0 ShouldContainKey titlePrefix
+          - result.bodyjson.bodyjson0 ShouldContainKey severity
+          - result.bodyjson.bodyjson0 ShouldContainKey status
+          - result.bodyjson.bodyjson0 ShouldContainKey tags
+          - result.bodyjson.bodyjson0 ShouldContainKey tlp
+
+
+  - name: Get investigation template
+    steps:
+      - type: http
+        method: GET
+        url: {{.url}}/v1/investigations/template/0a7e3e90-6e96-4c0c-b522-d1531c4539ef
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey createdBy
+          - result.bodyjson ShouldContainKey createdAt
+          - result.bodyjson ShouldContainKey description
+          - result.bodyjson ShouldContainKey titlePrefix
+          - result.bodyjson ShouldContainKey severity
+          - result.bodyjson ShouldContainKey status
+          - result.bodyjson ShouldContainKey tags
+          - result.bodyjson ShouldContainKey tlp
+
+  - name: Get investigation template from another tenant
+    steps:
+      - type: http
+        method: GET
+        url: {{.url}}/v1/investigations/template/e8adeff8-5827-46c7-adb8-9bc2809d2e0f
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 404
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Create investigation template
+    steps:
+      - type: http
+        method: POST
+        url: {{.url}}/v1/investigations/template
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"description": "This is a testing template", "titlePrefix": "Testing", "severity": "Critical", "status": "New", "tags": ["createtag"], "tlp": 2}'
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey createdBy
+          - result.bodyjson ShouldContainKey createdAt
+          - result.bodyjson ShouldContainKey description
+          - result.bodyjson ShouldContainKey titlePrefix
+          - result.bodyjson ShouldContainKey severity
+          - result.bodyjson ShouldContainKey status
+          - result.bodyjson ShouldContainKey tags
+          - result.bodyjson ShouldContainKey tlp
+
+  - name: Update investigation template
+    steps:
+      - type: http
+        method: PUT
+        url: {{.url}}/v1/investigations/template/0a7e3e90-6e96-4c0c-b522-d1531c4539ef
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"description": "This is a testing template", "titlePrefix": "Testing", "severity": "Critical", "status": "New", "tags": ["createtag"], "tlp": 2}'
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey createdBy
+          - result.bodyjson ShouldContainKey createdAt
+          - result.bodyjson ShouldContainKey description
+          - result.bodyjson ShouldContainKey titlePrefix
+          - result.bodyjson ShouldContainKey severity
+          - result.bodyjson ShouldContainKey status
+          - result.bodyjson ShouldContainKey tags
+          - result.bodyjson ShouldContainKey tlp
+
+  - name: Update investigation template from another tenant
+    steps:
+      - type: http
+        method: PUT
+        url: {{.url}}/v1/investigations/template/e8adeff8-5827-46c7-adb8-9bc2809d2e0f
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"description": "This is a testing template", "titlePrefix": "Testing", "severity": "Critical", "status": "New", "tags": ["createtag"], "tlp": 2}'
+        assertions:
+          - result.statuscode ShouldEqual 404
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Delete investigation template
+    steps:
+      - type: http
+        method: DELETE
+        url: {{.url}}/v1/investigations/template/5bde8616-b0b0-4541-8032-56a18f69b5ca
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 204
+
+  - name: Delete investigation template from another tenant
+    steps:
+      - type: http
+        method: DELETE
+        url: {{.url}}/v1/investigations/template/e8adeff8-5827-46c7-adb8-9bc2809d2e0f
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 404
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId

@@ -1,0 +1,215 @@
+name: Investigation Routes Test
+
+vars:
+  url: http://localhost:9000
+  validtenant: forge_SQFo1b3.QjMLd36neDn5HQpRTREe97x2zc59dP9dSreUONGmlYvt
+
+testcases:
+  - name: List investigations
+    steps:
+      - type: http
+        method: GET
+        url: {{.url}}/v1/investigations
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson.__type__ ShouldEqual Array
+          - result.bodyjson.bodyjson0 ShouldContainKey id
+          - result.bodyjson.bodyjson0 ShouldContainKey assignedTo
+          - result.bodyjson.bodyjson0 ShouldContainKey createdBy
+          - result.bodyjson.bodyjson0 ShouldContainKey createdAt
+          - result.bodyjson.bodyjson0 ShouldContainKey comments
+          - result.bodyjson.bodyjson0 ShouldContainKey description
+          - result.bodyjson.bodyjson0 ShouldContainKey investigationId
+          - result.bodyjson.bodyjson0 ShouldContainKey severity
+          - result.bodyjson.bodyjson0 ShouldContainKey status
+          - result.bodyjson.bodyjson0 ShouldContainKey tags
+          - result.bodyjson.bodyjson0 ShouldContainKey title
+          - result.bodyjson.bodyjson0 ShouldContainKey tlp
+
+  - name: List investigations with limit
+    steps:
+      - type: http
+        method: GET
+        url: {{.url}}/v1/investigations?limit=1
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson.__type__ ShouldEqual Array
+          - result.bodyjson.__len__ ShouldEqual 1
+          - result.bodyjson.bodyjson0 ShouldContainKey id
+          - result.bodyjson.bodyjson0 ShouldContainKey assignedTo
+          - result.bodyjson.bodyjson0 ShouldContainKey createdBy
+          - result.bodyjson.bodyjson0 ShouldContainKey createdAt
+          - result.bodyjson.bodyjson0 ShouldContainKey comments
+          - result.bodyjson.bodyjson0 ShouldContainKey description
+          - result.bodyjson.bodyjson0 ShouldContainKey investigationId
+          - result.bodyjson.bodyjson0 ShouldContainKey severity
+          - result.bodyjson.bodyjson0 ShouldContainKey status
+          - result.bodyjson.bodyjson0 ShouldContainKey tags
+          - result.bodyjson.bodyjson0 ShouldContainKey title
+          - result.bodyjson.bodyjson0 ShouldContainKey tlp
+
+  - name: Get investigations
+    steps:
+      - type: http
+        method: GET
+        url: {{.url}}/v1/investigations/5a85fe12-b4d6-43b8-acbb-736e94aaba35
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey assignedTo
+          - result.bodyjson ShouldContainKey createdBy
+          - result.bodyjson ShouldContainKey createdAt
+          - result.bodyjson ShouldContainKey comments
+          - result.bodyjson ShouldContainKey description
+          - result.bodyjson ShouldContainKey investigationId
+          - result.bodyjson ShouldContainKey severity
+          - result.bodyjson ShouldContainKey status
+          - result.bodyjson ShouldContainKey tags
+          - result.bodyjson ShouldContainKey title
+          - result.bodyjson ShouldContainKey tlp
+
+  - name: Get investigation from another tenant
+    steps:
+      - type: http
+        method: GET
+        url: {{.url}}/v1/investigations/a58df6f9-bbd4-450c-8fb0-588411546666
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 404
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Create investigation
+    steps:
+      - type: http
+        method: POST
+        url: {{.url}}/v1/investigations
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"assignedTo": "", "description": "This is a test investigation", "severity": "Critical", "status": "In Progress", "tags": ["test"], "title": "test investigation", "tlp": 1}'
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey assignedTo
+          - result.bodyjson ShouldContainKey createdBy
+          - result.bodyjson ShouldContainKey createdAt
+          - result.bodyjson ShouldContainKey comments
+          - result.bodyjson ShouldContainKey description
+          - result.bodyjson ShouldContainKey investigationId
+          - result.bodyjson ShouldContainKey severity
+          - result.bodyjson ShouldContainKey status
+          - result.bodyjson ShouldContainKey tags
+          - result.bodyjson ShouldContainKey title
+          - result.bodyjson ShouldContainKey tlp
+
+
+  - name: Create investigation from template
+    steps:
+      - type: http
+        method: POST
+        url: {{.url}}/v1/investigations
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"templateId": "0a7e3e90-6e96-4c0c-b522-d1531c4539ef", "title": "Template Test Title"}'
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey assignedTo
+          - result.bodyjson ShouldContainKey createdBy
+          - result.bodyjson ShouldContainKey createdAt
+          - result.bodyjson ShouldContainKey comments
+          - result.bodyjson ShouldContainKey description
+          - result.bodyjson ShouldContainKey investigationId
+          - result.bodyjson ShouldContainKey severity
+          - result.bodyjson ShouldContainKey status
+          - result.bodyjson ShouldContainKey tags
+          - result.bodyjson ShouldContainKey title
+          - result.bodyjson ShouldContainKey tlp
+
+  - name: Create investigation with invalid template id
+    steps:
+      - type: http
+        method: POST
+        url: {{.url}}/v1/investigations
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"templateId": "aaaa"}'
+        assertions:
+          - result.statuscode ShouldEqual 404
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Update investigation
+    steps:
+      - type: http
+        method: PUT
+        url: {{.url}}/v1/investigations/5a85fe12-b4d6-43b8-acbb-736e94aaba35
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"assignedTo": "", "description": "This is a test investigation", "severity": "Critical", "status": "In Progress", "tags": ["test", "testupdate"], "title": "test investigation update", "tlp": 2}'
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey assignedTo
+          - result.bodyjson ShouldContainKey createdBy
+          - result.bodyjson ShouldContainKey createdAt
+          - result.bodyjson ShouldContainKey comments
+          - result.bodyjson ShouldContainKey description
+          - result.bodyjson ShouldContainKey investigationId
+          - result.bodyjson ShouldContainKey severity
+          - result.bodyjson ShouldContainKey status
+          - result.bodyjson ShouldContainKey tags
+          - result.bodyjson ShouldContainKey title
+          - result.bodyjson ShouldContainKey tlp
+
+  - name: Update investigation from another tenant
+    steps:
+      - type: http
+        method: PUT
+        url: {{.url}}/v1/investigations/a58df6f9-bbd4-450c-8fb0-588411546666
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"assignedTo": "", "description": "This is a test investigation", "severity": "Critical", "status": "In Progress", "tags": ["test", "testupdate"], "title": "test investigation update", "tlp": 2}'
+        assertions:
+          - result.statuscode ShouldEqual 404
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Delete investigation
+    steps:
+      - type: http
+        method: DELETE
+        url: {{.url}}/v1/investigations/9108b666-34c1-445b-99fa-a263f0b247b3
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 204
+
+  - name: Delete investigation from another tenant
+    steps:
+      - type: http
+        method: DELETE
+        url: {{.url}}/v1/investigations/a58df6f9-bbd4-450c-8fb0-588411546666
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 404
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+

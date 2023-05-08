@@ -1,0 +1,169 @@
+name: Incident Comment Routes Test
+
+vars:
+  url: http://localhost:9000
+  validtenant: forge_SQFo1b3.QjMLd36neDn5HQpRTREe97x2zc59dP9dSreUONGmlYvt
+
+testcases:
+  - name: List incident comments
+    steps:
+      - type: http
+        method: GET
+        url: {{.url}}/v1/incidents/87e31788-2625-4bb2-ae21-004e07f76d45/comments
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson.__type__ ShouldEqual Array
+          - result.bodyjson.bodyjson0 ShouldContainKey id
+          - result.bodyjson.bodyjson0 ShouldContainKey comment
+          - result.bodyjson.bodyjson0 ShouldContainKey createdAt
+          - result.bodyjson.bodyjson0 ShouldContainKey createdBy
+          - result.bodyjson.bodyjson0 ShouldContainKey order
+
+  - name: List incident comments with limit
+    steps:
+      - type: http
+        method: GET
+        url: {{.url}}/v1/incidents/87e31788-2625-4bb2-ae21-004e07f76d45/comments?limit=1
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson.__type__ ShouldEqual Array
+          - result.bodyjson.__len__ ShouldEqual 1
+          - result.bodyjson.bodyjson0 ShouldContainKey id
+          - result.bodyjson.bodyjson0 ShouldContainKey comment
+          - result.bodyjson.bodyjson0 ShouldContainKey createdAt
+          - result.bodyjson.bodyjson0 ShouldContainKey createdBy
+          - result.bodyjson.bodyjson0 ShouldContainKey order
+
+  - name: Get incident comment
+    steps:
+      - type: http
+        method: GET
+        url: {{.url}}/v1/incidents/87e31788-2625-4bb2-ae21-004e07f76d45/comments/0509add2-0ed1-469c-8af3-6dd95d293eae
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey comment
+          - result.bodyjson ShouldContainKey createdAt
+          - result.bodyjson ShouldContainKey createdBy
+          - result.bodyjson ShouldContainKey order
+
+  - name: Get incident comment from another tenant
+    steps:
+      - type: http
+        method: GET
+        url: {{.url}}/v1/incidents/867dbf0d-fe67-4b25-8dc7-22c2667fbf39/comments/7cd5e91c-49e8-42fb-a5e4-d2241b8a84db
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 404
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Create incident comment
+    steps:
+      - type: http
+        method: POST
+        url: {{.url}}/v1/incidents/87e31788-2625-4bb2-ae21-004e07f76d45/comments
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"comment": "Created new comment"}'
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey comment
+          - result.bodyjson ShouldContainKey createdAt
+          - result.bodyjson ShouldContainKey createdBy
+          - result.bodyjson ShouldContainKey order
+
+  - name: Create incident comment with invalid body
+    steps:
+      - type: http
+        method: POST
+        url: {{.url}}/v1/incidents/87e31788-2625-4bb2-ae21-004e07f76d45/comments
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"commentTest": "test comment"}'
+        assertions:
+          - result.statuscode ShouldEqual 400
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Update incident comment
+    steps:
+      - type: http
+        method: PUT
+        url: {{.url}}/v1/incidents/87e31788-2625-4bb2-ae21-004e07f76d45/comments/0509add2-0ed1-469c-8af3-6dd95d293eae
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"comment": "Updated comment"}'
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey comment
+          - result.bodyjson ShouldContainKey createdAt
+          - result.bodyjson ShouldContainKey createdBy
+          - result.bodyjson ShouldContainKey order
+
+  - name: Update incident comment from another tenant
+    steps:
+      - type: http
+        method: PUT
+        url: {{.url}}/v1/incidents/867dbf0d-fe67-4b25-8dc7-22c2667fbf39/comments/7cd5e91c-49e8-42fb-a5e4-d2241b8a84db
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"comment": "Updated comment"}'
+        assertions:
+          - result.statuscode ShouldEqual 404
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Update incident comment with invalid body
+    steps:
+      - type: http
+        method: PUT
+        url: {{.url}}/v1/incidents/87e31788-2625-4bb2-ae21-004e07f76d45/comments/0509add2-0ed1-469c-8af3-6dd95d293eae
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"commentTest": "test comment"}'
+        assertions:
+          - result.statuscode ShouldEqual 400
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Delete incident comment
+    steps:
+      - type: http
+        method: DELETE
+        url: {{.url}}/v1/incidents/87e31788-2625-4bb2-ae21-004e07f76d45/comments/5447dc2f-92fa-4a5d-b884-7b624a8ae67b
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 204
+
+  - name: Delete incident comment from another tenant
+    steps:
+      - type: http
+        method: DELETE
+        url: {{.url}}/v1/incidents/87e31788-2625-4bb2-ae21-004e07f76d45/comments/7cd5e91c-49e8-42fb-a5e4-d2241b8a84db
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 404
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId

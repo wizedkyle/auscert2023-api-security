@@ -1,0 +1,82 @@
+name: Tenant Routes Test
+
+vars:
+  url: http://localhost:9000
+
+testcases:
+  - name: Get tenant
+    steps:
+      - type: http
+        method: GET
+        url: {{.url}}/v1/tenants/16167d1f-b2c7-4286-82e6-dde3d5eb449d
+        headers:
+          Authorization: forge_SQFo1b3.QjMLd36neDn5HQpRTREe97x2zc59dP9dSreUONGmlYvt
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson ShouldContainKey tenantId
+          - result.bodyjson ShouldContainKey name
+
+  - name: Create tenant
+    steps:
+      - type: http
+        method: POST
+        url: {{.url}}/v1/tenants
+        headers:
+          Authorization: forge_SQFo1b3.QjMLd36neDn5HQpRTREe97x2zc59dP9dSreUONGmlYvt
+        body: '{"name": "E2E Tenant"}'
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson ShouldContainKey tenantId
+          - result.bodyjson ShouldContainKey name
+
+  - name: Create tenant with invalid body
+    steps:
+      - type: http
+        method: POST
+        url: {{.url}}/v1/tenants
+        headers:
+          Authorization: forge_SQFo1b3.QjMLd36neDn5HQpRTREe97x2zc59dP9dSreUONGmlYvt
+        body: '{"nametest": "E2E Tenant"}'
+        assertions:
+          - result.statuscode ShouldEqual 400
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Update tenant
+    steps:
+      - type: http
+        method: PUT
+        url: {{.url}}/v1/tenants/16167d1f-b2c7-4286-82e6-dde3d5eb449d
+        headers:
+          Authorization: forge_SQFo1b3.QjMLd36neDn5HQpRTREe97x2zc59dP9dSreUONGmlYvt
+        body: '{"name": "E2E Tenant"}'
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson ShouldContainKey tenantId
+          - result.bodyjson ShouldContainKey name
+
+  - name: Update tenant with invalid body
+    steps:
+      - type: http
+        method: PUT
+        url: {{.url}}/v1/tenants/16167d1f-b2c7-4286-82e6-dde3d5eb449d
+        headers:
+          Authorization: forge_SQFo1b3.QjMLd36neDn5HQpRTREe97x2zc59dP9dSreUONGmlYvt
+        body: '{"nametest": "E2E Tenant"}'
+        assertions:
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Delete tenant
+    steps:
+      - type: http
+        method: DELETE
+        url: {{.url}}/v1/tenants/16167d1f-b2c7-4286-82e6-dde3d5eb449d
+        headers:
+          Authorization: forge_SQFo1b3.QjMLd36neDn5HQpRTREe97x2zc59dP9dSreUONGmlYvt
+        assertions:
+          - result.statuscode ShouldEqual 204

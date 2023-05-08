@@ -1,0 +1,267 @@
+name: Webhook Routes Test
+
+vars:
+  url: http://localhost:9000
+  validtenant: forge_SQFo1b3.QjMLd36neDn5HQpRTREe97x2zc59dP9dSreUONGmlYvt
+
+testcases:
+  - name: List webhooks
+    steps:
+      - type: http
+        method: GET
+        url: {{.url}}/v1/webhooks
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson.__type__ ShouldEqual Array
+          - result.bodyjson.bodyjson0 ShouldContainKey id
+          - result.bodyjson.bodyjson0 ShouldContainKey algorithm
+          - result.bodyjson.bodyjson0 ShouldContainKey description
+          - result.bodyjson.bodyjson0 ShouldContainKey events
+          - result.bodyjson.bodyjson0 ShouldContainKey secret
+          - result.bodyjson.bodyjson0 ShouldContainKey url
+
+  - name: List webhooks with limit
+    steps:
+      - type: http
+        method: GET
+        url: {{.url}}/v1/webhooks?limit=1
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson.__type__ ShouldEqual Array
+          - result.bodyjson.__len__ ShouldEqual 1
+          - result.bodyjson.bodyjson0 ShouldContainKey id
+          - result.bodyjson.bodyjson0 ShouldContainKey algorithm
+          - result.bodyjson.bodyjson0 ShouldContainKey description
+          - result.bodyjson.bodyjson0 ShouldContainKey events
+          - result.bodyjson.bodyjson0 ShouldContainKey secret
+          - result.bodyjson.bodyjson0 ShouldContainKey url
+
+  - name: Get webhook
+    steps:
+      - type: http
+        method: GET
+        url: {{.url}}/v1/webhooks/304c73db-d06a-48d1-a490-ff1c69ab4a6d
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey algorithm
+          - result.bodyjson ShouldContainKey description
+          - result.bodyjson ShouldContainKey events
+          - result.bodyjson ShouldContainKey secret
+          - result.bodyjson ShouldContainKey url
+
+  - name: Get webhook from another tenant
+    steps:
+      - type: http
+        method: GET
+        url: {{.url}}/v1/webhooks/c5535e1d-bb3c-4c1a-af10-0fa693a9e6d4
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 404
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Create webhook
+    steps:
+      - type: http
+        method: POST
+        url: {{.url}}/v1/webhooks
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"description": "test webhook", "events": ["access_key_created"], "url": "https://forgeresponse.com"}'
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey algorithm
+          - result.bodyjson ShouldContainKey description
+          - result.bodyjson ShouldContainKey events
+          - result.bodyjson ShouldContainKey secret
+          - result.bodyjson ShouldContainKey url
+
+  - name: Create webhook with invalid event
+    steps:
+      - type: http
+        method: POST
+        url: {{.url}}/v1/webhooks
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"description": "test webhook", "events": ["access_created"], "url": "https://forgeresponse.com"}'
+        assertions:
+          - result.statuscode ShouldEqual 400
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Create webhook with invalid url
+    steps:
+      - type: http
+        method: POST
+        url: {{.url}}/v1/webhooks
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"description": "test webhook", "events": ["access_key_created"], "url": "forgeresponse.com"}'
+        assertions:
+          - result.statuscode ShouldEqual 400
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Create access key with invalid body
+    steps:
+      - type: http
+        method: POST
+        url: {{.url}}/v1/webhooks
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"descriptionTest": "test webhook", "eventsTest": ["access_key_created"], "urlTest": "forgeresponse.com"}'
+        assertions:
+          - result.statuscode ShouldEqual 400
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Update webhook
+    steps:
+      - type: http
+        method: PUT
+        url: {{.url}}/v1/webhooks/86ecacb3-94b2-4e47-aab1-9de2b973194f
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"description": "test webhook", "events": ["access_key_created"], "url": "https://forgeresponse.com"}'
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey algorithm
+          - result.bodyjson ShouldContainKey description
+          - result.bodyjson ShouldContainKey events
+          - result.bodyjson ShouldContainKey secret
+          - result.bodyjson ShouldContainKey url
+
+  - name: Update webhook from another tenant
+    steps:
+      - type: http
+        method: PUT
+        url: {{.url}}/v1/webhooks/c5535e1d-bb3c-4c1a-af10-0fa693a9e6d4
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"description": "test webhook", "events": ["access_key_created"], "url": "https://forgeresponse.com"}'
+        assertions:
+          - result.statuscode ShouldEqual 404
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Update webhook with invalid event
+    steps:
+      - type: http
+        method: PUT
+        url: {{.url}}/v1/webhooks/86ecacb3-94b2-4e47-aab1-9de2b973194f
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"description": "test webhook", "events": ["access_created"], "url": "https://forgeresponse.com"}'
+        assertions:
+          - result.statuscode ShouldEqual 400
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Update webhook with invalid url
+    steps:
+      - type: http
+        method: PUT
+        url: {{.url}}/v1/webhooks/86ecacb3-94b2-4e47-aab1-9de2b973194f
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"description": "test webhook", "events": ["access_key_created"], "url": "forgeresponse.com"}'
+        assertions:
+          - result.statuscode ShouldEqual 400
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Update webhook with invalid body
+    steps:
+      - type: http
+        method: PUT
+        url: {{.url}}/v1/webhooks/86ecacb3-94b2-4e47-aab1-9de2b973194f
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"descriptionTest": "test webhook", "eventsTest": ["access_key_created"], "urlTest": "https://forgeresponse.com"}'
+        assertions:
+          - result.statuscode ShouldEqual 400
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Rotate webhook secret
+    steps:
+      - type: http
+        method: POST
+        url: {{.url}}/v1/webhooks/86ecacb3-94b2-4e47-aab1-9de2b973194f/rotate
+        headers:
+          Authorization: {{.validtenant}}
+        body: ''
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey algorithm
+          - result.bodyjson ShouldContainKey description
+          - result.bodyjson ShouldContainKey events
+          - result.bodyjson ShouldContainKey secret
+          - result.bodyjson ShouldContainKey url
+
+  - name: Rotate webhook secret from another tenant
+    steps:
+      - type: http
+        method: POST
+        url: {{.url}}/v1/webhooks/c5535e1d-bb3c-4c1a-af10-0fa693a9e6d4/rotate
+        headers:
+          Authorization: {{.validtenant}}
+        body: ''
+        assertions:
+          - result.statuscode ShouldEqual 404
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Delete webhook
+    steps:
+      - type: http
+        method: DELETE
+        url: {{.url}}/v1/webhooks/86ecacb3-94b2-4e47-aab1-9de2b973194f
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 204
+
+  - name: Delete webhook from another tenant
+    steps:
+      - type: http
+        method: DELETE
+        url: {{.url}}/v1/webhooks/c5535e1d-bb3c-4c1a-af10-0fa693a9e6d4
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 404
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+

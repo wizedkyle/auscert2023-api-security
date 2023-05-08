@@ -1,0 +1,164 @@
+name: Incident Routes Test
+
+vars:
+  url: http://localhost:9000
+  validtenant: forge_SQFo1b3.QjMLd36neDn5HQpRTREe97x2zc59dP9dSreUONGmlYvt
+
+testcases:
+  - name: List incidents
+    steps:
+      - type: http
+        method: GET
+        url: {{.url}}/v1/incidents
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson.__type__ ShouldEqual Array
+          - result.bodyjson.bodyjson0 ShouldContainKey id
+          - result.bodyjson.bodyjson0 ShouldContainKey assignedTo
+          - result.bodyjson.bodyjson0 ShouldContainKey createdBy
+          - result.bodyjson.bodyjson0 ShouldContainKey description
+          - result.bodyjson.bodyjson0 ShouldContainKey severity
+          - result.bodyjson.bodyjson0 ShouldContainKey status
+          - result.bodyjson.bodyjson0 ShouldContainKey tags
+          - result.bodyjson.bodyjson0 ShouldContainKey tasks
+          - result.bodyjson.bodyjson0 ShouldContainKey title
+          - result.bodyjson.bodyjson0 ShouldContainKey tlp
+
+  - name: List incidents with limit
+    steps:
+      - type: http
+        method: GET
+        url: {{.url}}/v1/incidents?limit=1
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson.__type__ ShouldEqual Array
+          - result.bodyjson.__len__ ShouldEqual 1
+          - result.bodyjson.bodyjson0 ShouldContainKey id
+          - result.bodyjson.bodyjson0 ShouldContainKey assignedTo
+          - result.bodyjson.bodyjson0 ShouldContainKey createdBy
+          - result.bodyjson.bodyjson0 ShouldContainKey description
+          - result.bodyjson.bodyjson0 ShouldContainKey severity
+          - result.bodyjson.bodyjson0 ShouldContainKey status
+          - result.bodyjson.bodyjson0 ShouldContainKey tags
+          - result.bodyjson.bodyjson0 ShouldContainKey tasks
+          - result.bodyjson.bodyjson0 ShouldContainKey title
+          - result.bodyjson.bodyjson0 ShouldContainKey tlp
+
+  - name: Get incident
+    steps:
+      - type: http
+        method: GET
+        url: {{.url}}/v1/incidents/87e31788-2625-4bb2-ae21-004e07f76d45
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey assignedTo
+          - result.bodyjson ShouldContainKey createdBy
+          - result.bodyjson ShouldContainKey description
+          - result.bodyjson ShouldContainKey severity
+          - result.bodyjson ShouldContainKey status
+          - result.bodyjson ShouldContainKey tags
+          - result.bodyjson ShouldContainKey tasks
+          - result.bodyjson ShouldContainKey title
+          - result.bodyjson ShouldContainKey tlp
+
+  - name: Get incident from another tenant
+    steps:
+      - type: http
+        method: GET
+        url: {{.url}}/v1/incidents/867dbf0d-fe67-4b25-8dc7-22c2667fbf39
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 404
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Create incident
+    steps:
+      - type: http
+        method: POST
+        url: {{.url}}/v1/incidents
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"assignedTo": "3298224e-e54b-4515-b724-71921d963e6d", "description": "Test incident", "severity": "critical", "status": "in-progress", "tags": [], "title": "Test Incident", "tlp": 3}'
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey assignedTo
+          - result.bodyjson ShouldContainKey createdBy
+          - result.bodyjson ShouldContainKey description
+          - result.bodyjson ShouldContainKey severity
+          - result.bodyjson ShouldContainKey status
+          - result.bodyjson ShouldContainKey tags
+          - result.bodyjson ShouldContainKey tasks
+          - result.bodyjson ShouldContainKey title
+          - result.bodyjson ShouldContainKey tlp
+
+  - name: Update incident
+    steps:
+      - type: http
+        method: PUT
+        url: {{.url}}/v1/incidents/670dbf0d-fe67-4b25-8dc7-22c2557fbf06
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"assignedTo": "3298224e-e54b-4515-b724-71921d963e6d", "description": "Test incident Update", "severity": "critical", "status": "in-progress", "tags": [], "title": "Test Incident", "tlp": 3}'
+        assertions:
+          - result.statuscode ShouldEqual 200
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey assignedTo
+          - result.bodyjson ShouldContainKey createdBy
+          - result.bodyjson ShouldContainKey description
+          - result.bodyjson ShouldContainKey severity
+          - result.bodyjson ShouldContainKey status
+          - result.bodyjson ShouldContainKey tags
+          - result.bodyjson ShouldContainKey tasks
+          - result.bodyjson ShouldContainKey title
+          - result.bodyjson ShouldContainKey tlp
+
+  - name: Update incident from another tenant
+    steps:
+      - type: http
+        method: PUT
+        url: {{.url}}/v1/incidents/867dbf0d-fe67-4b25-8dc7-22c2667fbf39
+        headers:
+          Authorization: {{.validtenant}}
+        body: '{"assignedTo": "3298224e-e54b-4515-b724-71921d963e6d", "description": "Test incident Update", "severity": "critical", "status": "in-progress", "tags": [], "title": "Test Incident", "tlp": 3}'
+        assertions:
+          - result.statuscode ShouldEqual 404
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
+
+  - name: Delete incident
+    steps:
+      - type: http
+        method: DELETE
+        url: {{.url}}/v1/incidents/670dbf0d-fe67-4b25-8dc7-22c2557fbf06
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 204
+
+  - name: Delete incident from another tenant
+    steps:
+      - type: http
+        method: DELETE
+        url: {{.url}}/v1/incidents/867dbf0d-fe67-4b25-8dc7-22c2667fbf39
+        headers:
+          Authorization: {{.validtenant}}
+        assertions:
+          - result.statuscode ShouldEqual 404
+          - result.bodyjson ShouldContainKey id
+          - result.bodyjson ShouldContainKey message
+          - result.bodyjson ShouldContainKey code
+          - result.bodyjson ShouldContainKey transactionId
