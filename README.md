@@ -21,7 +21,7 @@ docker compose up
 4. Test the environment is running:
 
 ```bash
-curl http://localhost:9000/v1/healthcheck -v
+curl http://localhost:9000/healthcheck -v
 ```
 
 5. You should have a 200 response returned from the API
